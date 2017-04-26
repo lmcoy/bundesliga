@@ -74,7 +74,8 @@ def winning_chances(goals1, goals2):
 
 if __name__ == "__main__":
     print 'load reference league to calculate team strength'
-    league = footballdata.New("BL1", 2016, [x for x in xrange(1,35)])
+    year = int(raw_input('year> '))
+    league = footballdata.New("BL1", year, [x for x in xrange(1,35)])
     print "played matches: %d" % (league.n_games/(len(league.teams)/2))
     PrintRanking(league)
 
@@ -85,7 +86,7 @@ if __name__ == "__main__":
         elif c == "table":
             PrintRanking(league)
         elif c == "simseason":
-            nleague = footballdata.New("BL1", 2016, [])
+            nleague = footballdata.New("BL1", year, [])
             end = SimulateSeason(league, nleague)
             PrintRanking(end)
         elif c == "match":
@@ -114,10 +115,10 @@ if __name__ == "__main__":
         elif c == "sim":
             SimulateCurrent(league, league)
         elif c == "simfull":
-            nleague = footballdata.New("BL1", 2016, [])
+            nleague = footballdata.New("BL1", year, [])
             SimulateCurrent(league, nleague)
         elif c == "update":
-            league = footballdata.New("BL1", 2016, [x for x in xrange(1,35)], update=True)
+            league = footballdata.New("BL1", year, [x for x in xrange(1,35)], update=True)
         else:
             print "%-15s %s" % ("update", "update data") 
             print "%-15s %s" % ("sim", "get prob." \

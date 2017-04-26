@@ -3,9 +3,9 @@ import json
 import os
 from league import *
 
-def download_leagues():
-    url = "http://api.football-data.org/v1/competitions/" 
-    download(url, "leagues.json")
+def download_leagues(year):
+    url = "http://api.football-data.org/v1/competitions/?season=%d" % year 
+    download(url, "leagues_%d.json" % year)
 
 def download_teams(league_id):
     url = "http://api.football-data.org/v1/competitions/%d/teams" % league_id
@@ -27,10 +27,10 @@ def update_league_ids(year, download):
     else:
         download_league_ids(year)
 
-def LoadLeagues(update=False):
-    if update or not os.path.exists("leagues.json"):
-        download_leagues()
-    with open('leagues.json') as infile:
+def LoadLeagues(year, update=False):
+    if update or not os.path.exists("leagues_%d.json" % year):
+        download_leagues(year)
+    with open('leagues_%d.json' % year) as infile:
         data = json.load(infile)
     return data
 
@@ -53,7 +53,7 @@ def LoadGames(league_id, update=False):
     return data
 
 def New(name, year, matchdays, update=False):
-    leagues = LoadLeagues(update)
+    leagues = LoadLeagues(year, update)
     league_id = None
     for league in leagues:
         if league["league"] == name:
