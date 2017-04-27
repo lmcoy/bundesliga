@@ -74,7 +74,8 @@ def New(name, year, matchdays, update=False):
 
     data = LoadGames(league_id, update)
     
-    league = League(teams)
+    timestamp = os.path.getmtime("leagues_%d.json" % year)
+    league = League(teams, unixtime=timestamp)
     for f in data["fixtures"]:
         team1 = f["homeTeamName"]
         team2 = f["awayTeamName"]

@@ -3,6 +3,7 @@ import numpy
 import footballdata
 from scipy import special
 import math
+import datetime
 
     
 def PrintRanking(league):
@@ -83,6 +84,10 @@ if __name__ == "__main__":
             print "error: enter an integer"
         except footballdata.DownloadError as err:
             print "error: could not download data: %s" % err.msg
+    if league.unixtime != None:
+        date = datetime.datetime\
+                .fromtimestamp(int(league.unixtime)).strftime('%Y-%m-%d %H:%M:%S')
+        print "last updated: %s" % date
     print "played matches: %d" % (league.n_games/(len(league.teams)/2))
     PrintRanking(league)
 

@@ -1,7 +1,7 @@
 from team import * 
 
 class League:
-    def __init__(self, teams):
+    def __init__(self, teams, unixtime=None):
         self.teams = {}
         for team in teams:
             self.teams[team] = Team(team) 
@@ -9,6 +9,7 @@ class League:
         self.goal_away = 0
         self.n_games = 0
         self.missing = []
+        self.unixtime = unixtime
 
     def AddMatch(self, team1, team2, goals1, goals2, weight):
         if not team1 in self.teams:
