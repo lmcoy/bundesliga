@@ -74,8 +74,15 @@ def winning_chances(goals1, goals2):
 
 if __name__ == "__main__":
     print 'load reference league to calculate team strength'
-    year = int(raw_input('year> '))
-    league = footballdata.New("BL1", year, [x for x in xrange(1,35)])
+    while True:
+        try:
+            year = int(raw_input('year> '))
+            league = footballdata.New("BL1", year, [x for x in xrange(1,35)])
+            break
+        except (TypeError, ValueError):
+            print "error: enter an integer"
+        except footballdata.DownloadError as err:
+            print "error: could not download data: %s" % err.msg
     print "played matches: %d" % (league.n_games/(len(league.teams)/2))
     PrintRanking(league)
 

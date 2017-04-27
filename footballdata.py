@@ -3,6 +3,13 @@ import json
 import os
 from league import *
 
+class Error(Exception):
+    pass
+
+class DownloadError(Error):
+    def __init__(self, msg):
+        self.msg = msg
+
 def download_leagues(year):
     url = "http://api.football-data.org/v1/competitions/?season=%d" % year 
     download(url, "leagues_%d.json" % year)
@@ -16,7 +23,10 @@ def download_matches(league_id):
     download(url, "matches_%d.json" % league_id)
 
 def download(url, fout):
-    response = urllib2.urlopen(url)
+    try:
+        response = urllib2.urlopen(url)
+    except urllib2.HTTPError as e:
+        raise DownloadError(str(e.reason))
     with open(fout, 'w') as output:
         output.write(response.read())
 
