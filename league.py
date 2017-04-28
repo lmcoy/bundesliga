@@ -75,8 +75,9 @@ class League:
     def GetList(self):
         l = []
         for team in self.teams:
-            l.append( (self.teams[team].name, self.teams[team].points) )
-        return sorted(l, key=lambda x: x[1], reverse=True)
+            t = self.teams[team]
+            l.append( (t.name, t.points,t.goals - t.goals_against ) )
+        return sorted(l, key=lambda x: (x[1], x[2]), reverse=True)
 
     def GetTeams(self):
         return list(self.teams.keys())

@@ -9,7 +9,7 @@ import datetime
 def PrintRanking(league):
     ranking = league.GetList() 
     for i in range(0, len(ranking)):
-        print "%2d %-30s %3d" % (i+1, ranking[i][0], ranking[i][1])
+        print "%2d %-30s %+3d %3d" % (i+1, ranking[i][0], ranking[i][2], ranking[i][1])
 
 
 def SimulateSeason(refleague, newleague):
