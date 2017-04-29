@@ -4,6 +4,9 @@ import footballdata
 from scipy import special
 import math
 import datetime
+from multiprocessing import Pool
+from multiprocessing import cpu_count
+from functools import partial
 
     
 def PrintRanking(league):
@@ -40,20 +43,46 @@ def SimulateSeason2(refleague, newleague):
     return nleague
 
 def SimulateCurrent(league, nleague):
+    func = partial(SimulateCurrentP, league, nleague)
+    N = 10000
+    ncpu = cpu_count()
+    args = [N/ncpu]*ncpu
+    p = Pool(ncpu)
+    d = p.map(func, args)
+    d = Reduce(d)
+    PrintRankProbability(d)
+
+
+def SimulateCurrentP(league, nleague, N):
     data = {}
     table = league.GetList()
     for team in table:
         data[team[0]] = [0]*18
 
-    N = 1000
     for i in xrange(0,N):
         league_end = SimulateSeason(league, nleague)
         table_end = league_end.GetList()
         for pos in xrange(0,len(table_end)):
             name = table_end[pos][0]
             data[name][pos] += 1
+    return data
 
-    print "%-24s |%s" % ("prob in %", "  ".join( "%6d" % x for x in xrange(1,len(table)+1)))
+def Reduce(datalist):
+    data = {}
+    for d in datalist:
+        for team in d:
+            if team in data:
+                for i in xrange(0, len(data[team])):
+                    data[team][i] += d[team][i]
+            else:
+                data[team] = d[team]
+    return data
+
+def PrintRankProbability(data):
+    key0 = data.keys()[0]
+    N = sum(data[key0])
+    nteams = len(data.keys())
+    print "%-24s |%s" % ("prob in %", "  ".join( "%6d" % x for x in xrange(1,nteams+1)))
     print "-"*168
     for team in data:
         matches = ", ".join( "%6.2f" % (float(x)/float(N)*100.0) for x in data[team])
