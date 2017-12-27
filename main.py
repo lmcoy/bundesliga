@@ -84,9 +84,17 @@ def PrintRankProbability(data):
     nteams = len(data.keys())
     print "%-24s |%s" % ("prob in %", "  ".join( "%6d" % x for x in xrange(1,nteams+1)))
     print "-"*168
+    lines = []
     for team in data:
+        m = [int(float(x)/float(N)*10000.0) for x in data[team]]
+        m2 = [i*m[i] for i in range(0,len(m))]
+        avg = sum(m2)/10000.0 + 1
         matches = ", ".join( "%6.2f" % (float(x)/float(N)*100.0) for x in data[team])
-        print "%-24s |%s" % (team, matches)
+        line =  "%-24s |%s" % (team, matches)
+        lines.append( (line, avg) )
+    for line in sorted(lines, key=lambda tup: tup[1]):
+        print line[0]
+
     
 
 def winning_chances(goals1, goals2):
