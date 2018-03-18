@@ -44,7 +44,7 @@ def SimulateSeason2(refleague, newleague):
 
 def SimulateCurrent(league, nleague):
     func = partial(SimulateCurrentP, league, nleague)
-    N = 10000
+    N = 50000
     ncpu = cpu_count()
     args = [N/ncpu]*ncpu
     p = Pool(ncpu)
@@ -57,40 +57,46 @@ def SimulateCurrentP(league, nleague, N):
     data = {}
     table = league.GetList()
     for team in table:
-        data[team[0]] = [0]*18
+        data[team[0]] = [[0]*18, 0, 0]
 
     for i in xrange(0,N):
         league_end = SimulateSeason(league, nleague)
         table_end = league_end.GetList()
         for pos in xrange(0,len(table_end)):
             name = table_end[pos][0]
-            data[name][pos] += 1
+            data[name][0][pos] += 1
+            data[name][1] += table_end[pos][1]
+            data[name][2] += table_end[pos][1]**2
     return data
 
 def Reduce(datalist):
     data = {}
+    avg_points = {}
     for d in datalist:
         for team in d:
             if team in data:
-                for i in xrange(0, len(data[team])):
-                    data[team][i] += d[team][i]
+                data[team][1] += d[team][1]
+                data[team][2] += d[team][2]
+                for i in xrange(0, len(data[team][0])):
+                    data[team][0][i] += d[team][0][i]
             else:
                 data[team] = d[team]
     return data
 
 def PrintRankProbability(data):
     key0 = data.keys()[0]
-    N = sum(data[key0])
+    N = sum(data[key0][0])
     nteams = len(data.keys())
-    print "%-24s |%s" % ("prob in %", "  ".join( "%6d" % x for x in xrange(1,nteams+1)))
+    print "%-24s |%s| avg. pts" % ("prob in %", " | ".join( "%6d" % x for x in xrange(1,nteams+1)))
     print "-"*168
     lines = []
     for team in data:
-        m = [int(float(x)/float(N)*10000.0) for x in data[team]]
+        m = [int(float(x)/float(N)*10000.0) for x in data[team][0]]
         m2 = [i*m[i] for i in range(0,len(m))]
         avg = sum(m2)/10000.0 + 1
-        matches = ", ".join( "%6.2f" % (float(x)/float(N)*100.0) for x in data[team])
-        line =  "%-24s |%s" % (team, matches)
+        matches = " | ".join( "%6.2f" % (float(x)/float(N)*100.0) for x in data[team][0])
+        var = math.sqrt(data[team][2]-(data[team][1])**2/float(N))/math.sqrt(float(N-1))
+        line =  "%-24s |%s| %3d +- %f" % (team, matches, data[team][1]/float(N), var)
         lines.append( (line, avg) )
     for line in sorted(lines, key=lambda tup: tup[1]):
         print line[0]
